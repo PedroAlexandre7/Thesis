@@ -1,168 +1,21 @@
-CHAPTER 1
+ CHAPTER 1
 Introduction
 Context and objective
-This thesis introduces the development of a sizing model for public IoT networks, explicitly designed to support smart city coverage planning. As urban environments increasingly rely on connected sensors, meters, and actuators, ensuring a reliable and scalable communication infrastructure becomes critical for municipalities and public authorities. The proposed model addresses this challenge by providing a structured, assumption-driven approach for initial network dimensioning, enabling planners to generate rapid, transparent, and defensible estimates of coverage, capacity, and resource requirements. By focusing on public IoT deployments within smart-city contexts, this work bridges the gap between conceptual planning and actionable design, offering a practical methodology for early-stage decision-making. Conventional network design toolchains tend to be either (i) sophisticated but closed and time-consuming to configure, or (ii) ad-hoc spreadsheets whose logic is difficult to audit or reuse. Public authorities and project teams often face a gap at the outset: they need a structured, assumption-driven sizing method that is lightweight enough for rapid iteration and rigorous enough to reveal key drivers and trade-offs. This gap is especially critical in public IoT deployments—such as city-wide, district, or municipal networks—where technology choices (e.g., LPWAN versus cellular), propagation conditions, device density, and duty-cycle constraints interact in complex and often unpredictable ways. (Albino et al., 2015; Zaman et al., 2024; Kanellopoulos et al., 2023; NIST Wireless SuperCluster, 2019; Azevedo & Mendonça, 2024; Suárez-Suárez et al., 2023; Si‑Mohammed et al., 2023; Waqar et al., 2025)
+This thesis reports a project consisting of the development of a sizing model for public IoT networks, explicitly designed to support smart city (Albino et al., 2015) coverage planning. As urban environments increasingly rely on connected sensors, meters, and actuators, ensuring a reliable and scalable communication infrastructure becomes critical for municipalities and public authorities. The proposed model addresses this challenge by providing a structured, assumption-driven approach for initial network dimensioning, enabling planners to generate rapid, transparent, and defensible estimates of coverage, capacity, and resource requirements. By focusing on public IoT deployments within smart city contexts, this work aims to bridge the gap between conceptual planning and actionable design, providing a practical methodology for early-stage decision-making. Conventional network design toolchains tend to be either (i) sophisticated but closed and time-consuming to configure, or (ii) ad-hoc spreadsheets whose logic is difficult to audit or reuse. Public authorities and project teams often face a gap at the outset: they need a structured, assumption-driven sizing method that is lightweight enough for rapid iteration and rigorous enough to reveal key drivers and trade-offs. This gap is especially critical in public IoT deployments—such as city-wide, district, or municipal networks—where technology choices (e.g., LPWAN versus cellular), propagation conditions, device density, and duty-cycle constraints interact in complex and often unpredictable ways. (Zaman et al., 2024) (Kanellopoulos et al., 2023) (NIST Wireless SuperCluster, 2019) (Azevedo & Mendonça, 2024) 
 
-This project, conducted within an industry–academia collaboration between ISCTE and KPMG, details the development of a spreadsheet‑based framework for dimensioning public IoT networks, with a focus on smart‑city coverage analysis. The proposed template uses formula‑based estimations (e.g., for throughput) and explores macro automation for its workflow. It adopts an assumption‑driven approach, aiming to demonstrate a streamlined methodology for initial network sizing and planning. The work benefited from supervision by KPMG—primary advisor Tomás Santos and secondary advisor Rúben Silva—and academic supervision at ISCTE by João Silva.
-(Aldabbagh et al., 2021; Piechowiak et al., 2023)
-The primary objective of this work is to develop and validate a reusable, spreadsheet-based template that facilitates the initial planning of public IoT networks for smart-city scenarios.
-Specifically, the project aims to: (1) define the minimum inputs and assumptions a planner needs to provide; (2) develop formula‑based estimates for link budget, throughput, message success rate, and site density; (3) organize the workbook so that dependencies are clear and easy to verify; and (4) investigate macro‑level automation (VBA) to handle common tasks—such as scenario setup, toggling assumptions, and generating standardized reports and charts. (Tong et al., 2023; Lima et al., 2024; Gupta, 2016)
-This objective leads to the following research questions:
-(RQ1) What are the essential parameters required to develop a practical dimensioning template for public IoT networks? (Piechowiak et al., 2023)
+This project, conducted within an industry–academia collaboration between ISCTE and KPMG, details the development of a spreadsheet‑based framework for dimensioning public IoT networks, with a focus on smart‑city (Albino et al., 2015) coverage analysis. The proposed template uses formula‑based estimations (e.g., for throughput) and explores macro automation for its workflow. It adopts an assumption‑driven approach, aiming to demonstrate a streamlined methodology for initial network sizing and planning. The work benefited from supervision by KPMG—primary advisor Tomás Santos and secondary advisor Rúben Silva—and academic supervision at ISCTE by João Silva.
+The primary objective of this work is to develop and validate a reusable, spreadsheet-based template that facilitates the initial planning of public IoT networks for smart-city scenarios. Specifically, the project aims to: (1) define what type of inputs a planner needs to provide; (2) develop formula‑based estimates for path loss (ETSI, 2022), link budget (Sharma et al., 2016) and throughput (Shannon, 1948); (3) organize the workbook so that dependencies are clear and easy to change; and (4) use macro‑level automation (VBA) to handle common tasks—such as scenario setup, toggling assumptions, and generating standardized reports and charts.
+These objectives lead to the following research questions:
+(RQ1) What are the essential parameters required to develop a practical dimensioning template for public IoT networks?
 (RQ2?) How does an assumption‑driven modeling approach impact the feasibility and utility of the dimensioning tool for initial network planning?
 (RQ3) What are the main practical challenges and limitations encountered when automating network-analysis processes within a spreadsheet environment? 
-(RQ4) How can the complex process of public IoT network dimensioning be simplified and modeled into a reusable template for rapid, first‑pass coverage analysis? (Aldabbagh et al., 2021; Piechowiak et al., 2023)
-Scope
-In scope, radio conditions and path‑loss are parameterized explicitly in "Base Stations Parameters"—enabling assumption‑driven link budgets (SNR, Rx/Tx power, gains, path‑loss model and margins) and throughput estimates (bandwidth, rank/MIMO layers, SE cap, overhead).
-This aligns with recent urban propagation modeling for LoRaWAN (Azevedo & Mendonça, 2024; Suárez‑Suárez et al., 2023) and with empirical NB‑IoT coverage studies that motivate repetition policies and deep‑indoor margins (Kousias et al., 2020; Yau et al., 2022; Ravi et al., 2019).
-The template targets the "first‑pass" stage of planning. Where clarity and speed are preferable over exhaustive fidelity. The modeling approach is explicitly assumption‑driven: users declare traffic models (e.g., payload sizes, periodicity), radio conditions (e.g., path‑loss model, noise signal), and sector devices.
-The outputs are screening‑level estimates of coverage, capacity, and site counts suitable for comparing alternatives and prioritizing further study. The template does not seek to replace detailed propagation simulation, war‑driving, or RF optimization.
-(Azevedo & Mendonça, 2024; Suárez-Suárez et al., 2023)
+(RQ4) How can the complex process of public IoT network dimensioning be simplified and modeled into a reusable template for rapid, first‑pass coverage analysis?
 Methodology 
-This thesis is implemented as an Excel macro workbook (03_project.xlsm) that operationalizes first‑pass dimensioning through a structured set of input and output sheets.
-The macro "CreateTablesFromInput" (in the workbook) reads declarative instructions from the sheet "Model Configurator" and builds auditable tables for scenarios.
-Key inputs are provided via: "Study Years" (planning horizon), "Regions" (geographical partition), "Verticals_Sectors" (use‑case taxonomy), "Network Parameters" (e.g., Busy‑Hour contention ratio, headroom), "Throughput Formulas" (device counts and traffic profiles), "Base Stations Sites" (site categories), "Base Stations Profiles" (per‑site capacity: simultaneously active users, downlink throughput), "Base Stations Parameters" (RF parameters for link budget and spectral‑efficiency calculations, including bandwidth, sectors, MIMO layers, SNR, antenna gains, path‑loss, other losses, carrier frequency, base‑station height, and interference margin), and "Sites per Region" (initial siting estimates).
-Outputs are generated in "Output Formulas" and consolidated in "Model Output" for screening‑level coverage/capacity and cost.
-This structure mirrors dimensioning methodologies proposed for public IoT networks (e.g., LoRaWAN and NB‑IoT), where explicit service targets and environmental parameters are surfaced for sensitivity analysis (Aldabbagh et al., 2021; Si‑Mohammed et al., 2023).
-The work proceeds by (i) requirements elicitation with practitioners; (ii) definition of a canonical, technology‑agnostic structure for the workbook; (iii) decision of compact formulas for key estimations; and (iv) implementation in Microsoft Excel using cell formulas for traceability and VBA for workflow automation. Particular attention is paid to separating input assumptions from computed layers, tagging each dependency, and enabling scenario replication with minimal manual steps. (Tong et al., 2023; Lima et al., 2024)
-
+This thesis is implemented as an Excel macro workbook (03_project.xlsm) that operationalizes first-pass dimensioning through a structured set of input and output sheets. The macro "CreateTablesFromInput" (in the workbook) reads declarative instructions from the sheet "Model Configurator" and builds auditable tables for scenarios. Key inputs are provided via: "Study Years" (planning horizon), "Regions" (geographical partition), "Verticals_Sectors" (use case taxonomy), "Network Parameters" (e.g., Busy Hour contention ratio, headroom), "Throughput Formulas" (device counts and traffic profiles), "Base Stations Sites" (site categories), "Base Stations Profiles" (per site capacity: simultaneously active users, downlink throughput), "Base Stations Parameters" (RF parameters for link budget and spectral efficiency calculations, including bandwidth, sectors, MIMO layers, SNR, antenna gains, path loss, other losses, carrier frequency, base station height, and interference margin), and "Sites per Region" (initial siting estimates). Outputs are generated in "Output Formulas" and consolidated in "Model Output" for screening level coverage/capacity and cost. 
+The work proceeds by (i) requirements elicitation with practitioners; (ii) definition of a canonical, technology agnostic structure for the workbook; (iii) decision of compact formulas for key estimations; and (iv) implementation in Microsoft Excel using cell formulas for traceability and VBA for workflow automation. Attention is paid to separating input assumptions from computed layers, tagging each dependency, and enabling scenario replication with minimal manual steps.
 
 Contributions
-The contributions of this project are threefold. First, it proposes a minimal yet complete set of parameters and structural components for a practical IoT dimensioning template, organizing inputs, calculations, and reporting so that the logic remains auditable. Second, it codifies a set of formula‑based estimations for the early sizing of public networks and shows how these can be combined to obtain coverage and capacity screens under explicit service targets. Third, it assesses the benefits and pain points of spreadsheet automation for network analysis—documenting where VBA macros streamline repetitive tasks and where the language and host environment impose limitations, maintenance overhead, or brittleness. (Aldabbagh et al., 2021; Piechowiak et al., 2023; Aldabbagh et al., 2021)
-An assumption‑driven model is both a strength and a limitation. It forces transparency about what is known versus what is asserted, enabling stakeholders to test sensitivity to radio margins, traffic distributions, or retry policies. At the same time, simplifying assumptions—such as homogeneous propagation classes, stationary traffic, or ideal scheduling—can overstate feasibility if taken too far. The template therefore emphasizes scenario tagging, parameter ranges, and "sanity‑check" dashboards to reveal when estimates fall outside plausible envelopes. (Research this last phrase; Tong et al., 2023; Lima et al., 2024)
-The project also documents the practicalities of automating a dimensioning workflow in a spreadsheet.
-Where appropriate, macros help (re)initialize scenarios, validate inputs, calculate batches, and render standardized charts and summaries. However, experience shows that non‑trivial automation in VBA is labor‑intensive, fragile under workbook evolution, and limited in terms of language ergonomics and testing support. These findings inform recommendations on what to automate in‑sheet versus what to keep as explicit, auditable formulas, and delineate pathways for migrating to more robust tooling when teams outgrow the template. (Piechowiak et al., 2023; Tong et al., 2023; Lima et al., 2024)
-From an industrial perspective, the template aims to shorten the time from idea to first‑order network plan, allowing consultants and municipal teams to triage options and focus detailed engineering where it matters most. By constraining the problem to declared assumptions and well‑scoped estimations, organizations can create repeatable analyses across districts or use cases and build a library of comparable scenarios. (Tong et al., 2023; Lima et al., 2024; Waqar et al., 2025)
-
-
-References
-Albino, V., Berardi, U., & Dangelico, R. M. (2015). Smart cities: Definitions, dimensions, performance, and initiatives. Journal of Urban Technology, 22(1), 3–21. https://doi.org/10.1080/10630732.2014.942092
-Aldabbagh, G., Dimitriou, N., Alkhuraiji, S., & Bamasag, O.
-(2021).
-Radio coverage and device capacity dimensioning methodologies for IoT LoRaWAN and NB-IoT deployments in urban environments.
-Future Internet, 13(6), 144.
-https://doi.org/10.3390/fi13060144
-Azevedo, J. A., & Mendonça, F. (2024). A critical review of the propagation models employed in LoRa systems. Sensors, 24(12), 3877. https://doi.org/10.3390/s24123877
-Gupta, A. (2016). Cell coverage area and link budget calculations in LTE system. Indian Journal of Science and Technology. https://doi.org/10.17485/IJST/2016/V9IS1/107935
-Kanellopoulos, D., Sharma, V.
-K., Panagiotakopoulos, T., & Kameas, A.
-(2023).
-Networking architectures and protocols for IoT applications in smart cities: Recent developments and perspectives.
-Electronics, 12(2490).
-https://doi.org/10.3390/electronics12112490
-Kousias, K., Caso, G., Alay, Ö., Brunstrom, A., De Nardis, L., Di Benedetto, M.-G., & Neri, M. (2020). Coverage and deployment analysis of NB‑IoT in the wild. arXiv:2005.02341.
-Lima, W.
-G., Lopes, A.
-V.
-R., Cardoso, C.
-M.
-M., Araújo, J.
-P.
-L., Neto, M.
-C.
-A., Tostes, M.
-E.
-L., Nascimento, A.
-A., Rodriguez, M., & Barros, F.
-J.
-B.
-(2024).
-LoRa technology propagation models for IoT network planning in the Amazon regions.
-Sensors, 24(5), 1621.
-https://doi.org/10.3390/s24051621
-NIST Wireless SuperCluster. (2019). The municipal Internet of Things (IoT) blueprint. https://pages.nist.gov/GCTC/super-clusters/
-Piechowiak, M., Zwierzykowski, P., & Musznicki, B. (2023). LoRaWAN metering infrastructure planning in smart cities. Applied Sciences, 13(14), 8431. https://doi.org/10.3390/app13148431
-Ravi, S., Zand, P., El Soussi, M., & Nabi, M. (2019). Evaluation, modeling and optimization of coverage enhancement methods of NB‑IoT. In 2019 IEEE PIMRC. https://doi.org/10.1109/PIMRC.2019.8904109
-Si‑Mohammed, S., Begin, T., Guérin Lassous, I., & Vicat‑Blanc, P. (2023). HINTS: A methodology for IoT network technology and configuration decision. Internet of Things, 100678. https://doi.org/10.1016/j.iot.2023.100678
-Suárez-Suárez, C.
-R., Rueda, D.
-F., Timaná-Eraso, L.
-C., & Leon-Leon, J.
-(2023).
-Adaptation of propagation models to improve the coverage range prediction of LoRaWAN technology at 915 MHz in an urban environment.
-International Journal of Electronics and Telecommunications, 69(4), 733–744.
-https://doi.org/10.24425/ijet.2023.147695
-Tong, S., Wang, J., Yang, J., Liu, Y., & Zhang, J. (2023). Citywide LoRa network deployment and operation: Measurements, analysis, and implications. Proceedings of ACM SenSys ’23. https://doi.org/10.1145/3625687.3625796
-Waqar, A., Barakat, T. A. H., Almujibah, H. R., Mohammed Alshehri, A., Alyami, H., & Alajmi, M. (2025). Analytical approach to smart and sustainable city development with IoT. Scientific Reports, 15, 88861. https://doi.org/10.1038/s41598-025-08861-y
-Yau, C.
-W., Jewsakul, S., Luk, M.
-H., Lee, A.
-P.
-Y., Chan, Y.
-H., Ngai, E.
-C.
-H., Pong, P.
-W.
-T., Lui, K.
-S., & Liu, J.
-(2022).
-NB‑IoT coverage and sensor node connectivity in dense urban environments: An empirical study.
-ACM Transactions on Sensor Networks, 18(3), 49.
-https://doi.org/10.1145/3536424
-Zaman, M., Puryear, N., Abdelwahed, S., & Zohrabi, N. (2024). A review of IoT-based smart city development and management. Smart Cities, 7(3), 1462–1501. https://doi.org/10.3390/smartcities7030061
-
-Updated References (APA 7th edition)
-Albino, V., Berardi, U., & Dangelico, R. M. (2015). Smart cities: Definitions, dimensions, performance, and initiatives. Journal of Urban Technology, 22(1), 3–21. https://doi.org/10.1080/10630732.2014.942092
-Aldabbagh, G., Dimitriou, N., Alkhuraiji, S., & Bamasag, O.
-(2021).
-Radio coverage and device capacity dimensioning methodologies for IoT LoRaWAN and NB‑IoT deployments in urban environments.
-Future Internet, 13(6), 144.
-https://doi.org/10.3390/fi13060144
-Azevedo, J. A., & Mendonça, F. (2024). A critical review of the propagation models employed in LoRa systems. Sensors, 24(12), 3877. https://doi.org/10.3390/s24123877
-Gupta, A. (2016). Cell coverage area and link budget calculations in LTE system. Indian Journal of Science and Technology. https://doi.org/10.17485/IJST/2016/V9IS1/107935
-Kanellopoulos, D., Sharma, V.
-K., Panagiotakopoulos, T., & Kameas, A.
-(2023).
-Networking architectures and protocols for IoT applications in smart cities: Recent developments and perspectives.
-Electronics, 12, 2490.
-https://doi.org/10.3390/electronics12112490
-Kousias, K., Caso, G., Alay, Ö., Brunstrom, A., De Nardis, L., Di Benedetto, M.‑G., & Neri, M. (2020). Coverage and deployment analysis of NB‑IoT in the wild. arXiv preprint, arXiv:2005.02341. https://arxiv.org/abs/2005.02341
-Lima, W.
-G., Lopes, A.
-V.
-R., Cardoso, C.
-M.
-M., Araújo, J.
-P.
-L., Neto, M.
-C.
-A., Tostes, M.
-E.
-L., Nascimento, A.
-A., Rodriguez, M., & Barros, F.
-J.
-B.
-(2024).
-LoRa technology propagation models for IoT network planning in the Amazon regions.
-Sensors, 24(5), 1621.
-https://doi.org/10.3390/s24051621
-NIST Wireless SuperCluster. (2019). The municipal Internet of Things (IoT) blueprint. NIST GCTC Blueprint (online report). https://pages.nist.gov/GCTC/super-clusters/
-Piechowiak, M., Zwierzykowski, P., & Musznicki, B. (2023). LoRaWAN metering infrastructure planning in smart cities. Applied Sciences, 13(14), 8431. https://doi.org/10.3390/app13148431
-Ravi, S., Zand, P., El Soussi, M., & Nabi, M. (2019). Evaluation, modeling and optimization of coverage enhancement methods of NB‑IoT. Proceedings of IEEE PIMRC 2019. https://doi.org/10.1109/PIMRC.2019.8904109
-Si‑Mohammed, S., Begin, T., Guérin Lassous, I., & Vicat‑Blanc, P. (2023). HINTS: A methodology for IoT network technology and configuration decision. Internet of Things, 100678. https://doi.org/10.1016/j.iot.2023.100678
-Suárez‑Suárez, C.
-R., Rueda, D.
-F., Timaná‑Eraso, L.
-C., & Leon‑Leon, J.
-(2023).
-Adaptation of propagation models to improve the coverage range prediction of LoRaWAN technology at 915 MHz in an urban environment.
-International Journal of Electronics and Telecommunications, 69(4), 733–744.
-https://doi.org/10.24425/ijet.2023.147695
-Tong, S., Wang, J., Yang, J., Liu, Y., & Zhang, J. (2023). Citywide LoRa network deployment and operation: Measurements, analysis, and implications. Proceedings of the ACM SenSys ’23. https://doi.org/10.1145/3625687.3625796
-Waqar, A., Barakat, T. A. H., Almujibah, H. R., Mohammed Alshehri, A., Alyami, H., & Alajmi, M. (2025). Analytical approach to smart and sustainable city development with IoT. Scientific Reports, 15, 88861. https://doi.org/10.1038/s41598-025-08861-y
-Yau, C.
-W., Jewsakul, S., Luk, M.
-H., Lee, A.
-P.
-Y., Chan, Y.
-H., Ngai, E.
-C.
-H., Pong, P.
-W.
-T., Lui, K.
-S., & Liu, J.
-(2022).
-NB‑IoT coverage and sensor node connectivity in dense urban environments: An empirical study.
-ACM Transactions on Sensor Networks, 18(3), 49.
-https://doi.org/10.1145/3536424
-Zaman, M., Puryear, N., Abdelwahed, S., & Zohrabi, N. (2024). A review of IoT‑based smart city development and management. Smart Cities, 7(3), 1462–1501. https://doi.org/10.3390/smartcities7030061
+The contributions of this project are threefold. First, it proposes a minimal yet complete set of parameters and structural components for a practical IoT dimensioning template, organizing inputs, calculations, and reporting so that the logic remains auditable. Second, it codifies a set of formula‑based estimations for the early sizing of public networks and shows how these can be combined to obtain coverage and capacity screens under explicit service targets. Third, it assesses the benefits and pain points of spreadsheet automation for network analysis—documenting where VBA macros streamline repetitive tasks and where the language and host environment impose limitations, maintenance overhead, or brittleness.
+An assumption‑driven model is both a strength and a limitation. It forces transparency about what is known versus what is asserted, enabling stakeholders to test sensitivity to radio margins, traffic distributions, or retry policies. At the same time, simplifying assumptions—such as homogeneous propagation classes, stationary traffic, or ideal scheduling—can overstate feasibility if taken too far. To enhance reliability, the template incorporates structured validation mechanisms. These include explicit scenario labeling for traceability, predefined parameter ranges to prevent unrealistic inputs, and summary dashboards that highlight deviations from expected performance thresholds.
+The thesis also documents the practicalities of automating a dimensioning workflow in a spreadsheet. Where appropriate, macros help (re)initialize scenarios, validate inputs, calculate batches, and render standardized charts and summaries. However, experience indicates that non‑trivial automation in VBA is not only labor‑intensive but also prone to fragility when workbook structures evolve, due to its tight coupling with sheet layouts and lack of modular design. (Power Streamline, 2024).
+From an industrial perspective, the template aims to shorten the time from idea to first‑order network plan, allowing consultants and municipal teams to triage options and focus detailed engineering where it matters most. By constraining the problem to declared assumptions and well‑scoped estimations, organizations can create repeatable analyses across districts or use cases and build a library of comparable scenarios. 
