@@ -46,13 +46,19 @@ Public Enum ClearDataOptions
 End Enum
 
 Function SetGlobalVariables()
-    Println "Setting Global Variables"
     DEFAULT_CLEAR_STARTING_ROW = 7
     DEFAULT_CONFIG_STARTING_ROW = 9
     DEFAULT_FIRST_CELL = "B8"
     firstYear = -1
-    Println "Default Clear Starting Row: " & DEFAULT_CLEAR_STARTING_ROW
-    Set configSheet = ThisWorkbook.Sheets("Model Configurator")
+    Call SetConfigSheet
     Set sheetsData = New Scripting.Dictionary
 End Function
 
+Function SetConfigSheet()
+    On Error Resume Next
+    Set configSheet = ThisWorkbook.Sheets("Model Configurator")
+    On Error GoTo 0
+    If configSheet Is Nothing Then
+        Set configSheet = ModelConfigurator 
+    End If
+End Function

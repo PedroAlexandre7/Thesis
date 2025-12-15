@@ -24,8 +24,13 @@ Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
     Dim tableRow As Integer
     Dim tableColumn As Integer
     
-    
+    On Error Resume Next
     Set mCSup = ThisWorkbook.Sheets("Model Configurator Sup")
+    On Error GoTo 0
+    If mCSup Is Nothing Then
+        Set mCSup = ModelConfiguratorSup
+    End If
+
     FIRST_SHEET_INDEX = mCSup.Cells(SpAddresses.SheetsListStartR, SpAddresses.SheetsListStartC).Value
     
     
