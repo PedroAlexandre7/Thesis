@@ -205,3 +205,15 @@ SuperClusters. (n.d.). Global City Teams Challenge.
 [43]  
 Zaman, M., Puryear, N., Abdelwahed, S., & Zohrabi, N. (2024). A review of IoT-Based Smart City Development and Management. Smart Cities, 7(3), 1462–1501.  
 [https://doi.org/10.3390/smartcities7030061](https://www.powerstreamline.com/post/vba-vs-modern-alternatives-strengths-and-weaknesses)  
+
+[44]
+Qin, M., Chen, L., Zhao, N., Chen, Y., Yu, F. R., & Wei, G. (2018). Power-Constrained edge computing with maximum processing capacity for IoT networks. IEEE Internet of Things Journal, 6(3), 4330–4343. [https://doi.org/10.1109/jiot.2018.2875218](https://doi.org/10.1109/jiot.2018.2875218)
+
+[45]
+Kherraf, N., Alameddine, H. A., Sharafeddine, S., Assi, C. M., & Ghrayeb, A. (2019). Optimized provisioning of edge computing resources with heterogeneous workload in IoT networks. IEEE Transactions on Network and Service Management, 16(2), 459–474. [https://doi.org/10.1109/tnsm.2019.2894955](https://doi.org/10.1109/tnsm.2019.2894955)
+
+[46]
+Ghanbari, Z., Navimipour, N. J., Hosseinzadeh, M., & Darwesh, A. (2019). Resource allocation mechanisms and approaches on the Internet of Things. Cluster Computing, 22(4), 1253–1282. [https://doi.org/10.1007/s10586-019-02910-8](https://doi.org/10.1007/s10586-019-02910-8)
+
+[47]
+Liu, X., Qin, Z., Gao, Y., McCann, J. A., Liu, X., Qin, Z., Gao, Y., & McCann, J. A. (2019). Resource allocation in wireless powered IoT networks. IEEE Internet of Things Journal, 6(3), 4935–4945. [https://doi.org/10.1109/jiot.2019.2895417](https://doi.org/10.1109/jiot.2019.2895417)
