@@ -1,0 +1,81 @@
+Chapter 3: The Artifact: A Declarative IoT Dimensioning Model
+
+3.1 Introduction and Design Philosophy
+
+As identified in Chapter 2, the current landscape of network planning tools presents a dichotomy between rigid, "black-box" professional simulators and fragile, ad-hoc spreadsheets. The objective of this project, as outlined in Chapter 1, is to bridge this "tooling gap" by developing a transparent, flexible, and scalable dimensioning model.
+
+This chapter describes the resulting artifact: a Declarative Excel-based IoT Dimensioning Tool.
+
+Unlike traditional engineering spreadsheets where logic, data, and presentation are hard-coded into specific cells (making them difficult to audit or scale), the proposed artifact adopts a Meta-Programming approach. The core philosophy is the separation of the definition of the model from its instantiation. The user defines the structure of the desired analysis (e.g., which tables to build, which years to simulate, how inputs relate to outputs) in a configuration interface, and an automation engine (VBA) dynamically constructs the analysis sheets.
+
+This architecture directly addresses the "scalability" and "transparency" requirements identified in the State of the Art. It allows the model to handle the complexity of Smart City verticals—varying significantly from agriculture to autonomous transport—without requiring the planner to manually rewrite the spreadsheet for every new scenario.
+
+3.2 System Architecture
+
+The artifact is architected around three distinct layers, transforming the standard Excel workbook into an application-like environment:
+
+The Configuration Layer (The "Blueprints"): A centralized control sheet named Model Configurator where the user defines the architecture of the dimensioning model using abstract instructions.
+
+The Execution Layer (The "Engine"): A VBA-based automation backend that interprets the configuration instructions and algorithmically builds the spreadsheet tables.
+
+The Presentation Layer (The "Interface"): The input and output sheets (Study Years, Regions, Network Parameters, etc.) where the actual planning data is entered and results are visualized.
+
+3.2.1 The Declarative Engine
+
+The heart of the artifact is the Model Configurator sheet and its accompanying VBA macro, CreateTablesFromInput. As evidenced by the VBA codebase (specifically Main.bas and the InputCells class), the tool does not hard-code table locations. Instead, it iterates through a list of "Instructions" defined by the user.
+
+Key instruction types implemented in the engine include:
+
+Header & Column: Defines the dimensions of the data tables.
+
+Title: Allows grouping tables by categories (e.g., creating a separate traffic table for every "Region").
+
+Years: A specialized instruction that automatically expands the model across the temporal dimension (e.g., 2023, 2025, 2030), a critical feature for long-term urban planning.
+
+Output: Directs the engine on where to generate the final calculation tables.
+
+This approach ensures that if a planner needs to add a new "Vertical" (e.g., adding "Drones" to the existing list in Verticals_Sectors), they simply modify the input list. The engine then dynamically reconstructs all dependent tables across the model, propagating the change without manual error.
+
+3.3 Functional Components and Input Structure
+
+The artifact organizes the dimensioning process into logical steps that align with the Traffic Theory principles discussed in Section 2.2.
+
+3.3.1 Service Taxonomy (Verticals_Sectors)
+
+Reflecting the "Verticals" approach advocated by the Municipal IoT Blueprint (Barkis et al., 2019), the model begins by defining the service taxonomy. The Verticals_Sectors sheet acts as the primary dimension for traffic generation. By categorizing services (e.g., "Utilities," "Public Safety"), the tool allows for granular traffic profiling, ensuring that low-bandwidth sensors are differentiated from high-bandwidth video streams.
+
+3.3.2 Network Parameters and Traffic Engineering
+
+The Network Parameters sheet serves as the repository for the global assumptions driving the capacity dimensioning. It translates the theoretical concepts of Erlang and Packet Switching into concrete inputs:
+
+Busy Hour Contention Ratio: Defines the concentration of traffic during peak windows.
+
+Headroom: Implements the "resiliency buffer" described in the State of the Art, allowing planners to set a safety margin (e.g., 20%) for emergency spikes.
+
+3.3.3 Infrastructure Definition (Base Stations Sites & Profiles)
+
+To support the technology-agnostic requirement (RQ1), the artifact separates the physical site counts from their technological capabilities.
+
+Base Stations Sites: Captures the "Supply" side of the equation—how many physical locations are available or planned per region.
+
+Base Stations Profiles: Defines the capability of each site type (e.g., "Standalone 5G - 3 Sectors" vs. "LoRaWAN Gateway"). This sheet includes critical dimensioning thresholds such as "Maximum Simultaneously Active Users" and "Maximum Throughput for Downlink," allowing the model to flag saturation based on either user density or data volume.
+
+3.4 The Calculation Engine
+
+The logical core of the artifact resides in the Throughput Formulas and Base Stations Parameters sheets. Here, the tool synthesizes the inputs to perform the actual dimensioning.
+
+3.4.1 Throughput and Capacity Dimensioning
+
+The model calculates the Aggregate Demand for every combination of Year, Region, and Vertical. It utilizes the formulas discussed in Section 2.3, multiplying the number of devices by their specific traffic profiles (throughput buckets) and applying the Busy Hour factor.
+
+Simultaneously, it calculates Network Supply based on the site profiles. A key feature of the artifact, visualized in the Output Formulas sheet, is the automated comparison of Demand vs. Supply. The model calculates saturation percentages, highlighting functionality gaps where demand exceeds the "Capacity Limited" constraints of the network.
+
+3.4.2 Coverage and Path Loss Validation
+
+While the primary focus is capacity, the artifact includes a coverage validation module in Base Stations Parameters. As detailed in the State of the Art, rigorous ray-tracing is often infeasible for high-level planning. Therefore, this tool implements formula-based Path Loss calculations (aligned with 3GPP TR 38.901 concepts) directly within the spreadsheet cells.
+
+By defining parameters such as Transmit Power, Antenna Gains, and Frequency (e.g., 800 MHz vs. 26 GHz), the model estimates the maximum cell radius. This allows the user to sanity-check if the number of sites proposed in the "Capacity" step is sufficient to provide physical signal coverage across the target region's area.
+
+3.5 Conclusion
+
+The artifact presented is not merely a calculator but a Declarative Modeling Environment. By leveraging VBA to automate the structural management of the spreadsheet (CreateTablesFromInput), it resolves the tension between the flexibility required for strategic planning and the robustness required for engineering. It successfully operationalizes the theoretical constraints of Smart City IoT—from vertical taxonomies to link budgets—into a usable, auditable, and scalable tool.
