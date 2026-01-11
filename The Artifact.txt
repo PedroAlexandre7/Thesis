@@ -1,40 +1,51 @@
-Chapter 3: The Artifact: A Declarative IoT Dimensioning Model
+Chapter 3: Implementation - The Artifact
 
-3.1 Introduction and Design Philosophy
+3.1 Overview and Design Philosophy
 
-As identified in Chapter 2, the current landscape of network planning tools presents a dichotomy between rigid, "black-box" professional simulators and fragile, ad-hoc spreadsheets. The objective of this project, as outlined in Chapter 1, is to bridge this "tooling gap" by developing a transparent, flexible, and scalable dimensioning model.
+This chapter details the design and implementation of the thesis artifact: a Declarative Excel-based IoT Dimensioning Framework.
 
-This chapter describes the resulting artifact: a Declarative Excel-based IoT Dimensioning Tool.
+As outlined in Chapter 1, the primary objective of this work is to bridge the gap between rigid, "black-box" professional simulators and fragile, ad-hoc spreadsheets. While standard spreadsheets are accessible, they often suffer from scalability issues; adding a new variable (e.g., a new planning year or a new vertical) typically requires manual restructuring of the entire workbook, leading to errors and auditing difficulties (Caulkins et al., 2007).
 
-Unlike traditional engineering spreadsheets where logic, data, and presentation are hard-coded into specific cells (making them difficult to audit or scale), the proposed artifact adopts a Meta-Programming approach. The core philosophy is the separation of the definition of the model from its instantiation. The user defines the structure of the desired analysis (e.g., which tables to build, which years to simulate, how inputs relate to outputs) in a configuration interface, and an automation engine (VBA) dynamically constructs the analysis sheets.
+To address Research Question 4 (How can the complex process of public IoT network dimensioning be simplified...?), the proposed artifact adopts a Meta-Programming approach. The core design philosophy is the strict separation of the definition of the model from its instantiation.
 
-This architecture directly addresses the "scalability" and "transparency" requirements identified in the State of the Art. It allows the model to handle the complexity of Smart City verticals—varying significantly from agriculture to autonomous transport—without requiring the planner to manually rewrite the spreadsheet for every new scenario.
+Instead of hard-coding logic into specific cells, the user defines the structure of the desired analysis—such as the planning horizon, geographical segmentation, and service taxonomy—in a centralized configuration interface. An automation engine (implemented in VBA) then interprets these high-level instructions to dynamically construct the necessary analysis sheets. This architecture transforms the workbook from a static calculation file into a dynamic modeling environment, ensuring that the tool remains:
+
+Scalable: Capable of handling varying numbers of regions or verticals without structural redesign.
+
+Transparent: Ensuring that all dimensioning assumptions are explicit and auditable.
+
+Assumption-Driven: Facilitating rapid "first-pass" dimensioning by allowing planners to toggle key constraints (e.g., traffic concurrency, coverage thresholds) centrally.
 
 3.2 System Architecture
 
-The artifact is architected around three distinct layers, transforming the standard Excel workbook into an application-like environment:
+The artifact functions as a layered application built within the Microsoft Excel environment. It is architected around three distinct layers, as illustrated in the system design:
 
-The Configuration Layer (The "Blueprints"): A centralized control sheet named Model Configurator where the user defines the architecture of the dimensioning model using abstract instructions.
+3.2.1 The Configuration Layer (The "Blueprints")
+The entry point for the planner is the Model Configurator sheet. This sheet acts as a domain-specific language (DSL) where the user defines the "Instructions" for the model. As seen in the tool's interface, this layer accepts abstract commands such as:
 
-The Execution Layer (The "Engine"): A VBA-based automation backend that interprets the configuration instructions and algorithmically builds the spreadsheet tables.
+Title: Groups data by logical entities (e.g., "Regions").
 
-The Presentation Layer (The "Interface"): The input and output sheets (Study Years, Regions, Network Parameters, etc.) where the actual planning data is entered and results are visualized.
+Years: Defines the temporal scope (e.g., 2023, 2025, 2030), automatically expanding the model's timeline.
 
-3.2.1 The Declarative Engine
+Output: Designates the target sheets for generating calculation tables.
 
-The heart of the artifact is the Model Configurator sheet and its accompanying VBA macro, CreateTablesFromInput. As evidenced by the VBA codebase (specifically Main.bas and the InputCells class), the tool does not hard-code table locations. Instead, it iterates through a list of "Instructions" defined by the user.
+3.2.2 The Orchestration Layer (The "Engine")
+The logic core is a VBA-based automation backend that reads the Configuration Layer and algorithmically builds the spreadsheet. This layer is encapsulated in the CreateTablesFromInput macro and relies on several custom classes (verified in the codebase 03_AllClsFiles.cls):
 
-Key instruction types implemented in the engine include:
+InputCells Class: An object representing a block of user inputs (e.g., a table of device densities). It stores metadata such as rowShift and columnShift, allowing the engine to place data dynamically without hard-coded cell references.
 
-Header & Column: Defines the dimensions of the data tables.
+TableSetData Class: Manages the properties of the output sheets, determining if data should be cleared, preserved, or if new sheets need to be generated for each study year.
 
-Title: Allows grouping tables by categories (e.g., creating a separate traffic table for every "Region").
+Main Module: The execution loop that iterates through the configuration instructions. It detects the instruction type (e.g., Header, Column, Output) and calls the CreateTables subroutine to render the content.
 
-Years: A specialized instruction that automatically expands the model across the temporal dimension (e.g., 2023, 2025, 2030), a critical feature for long-term urban planning.
+3.2.3 The Data Layer (The "Interface")
+The final layer consists of the generated Input and Output sheets where the actual planning occurs. These sheets are categorized into:
 
-Output: Directs the engine on where to generate the final calculation tables.
+Network Supply: Base Stations Sites, Base Stations Profiles.
 
-This approach ensures that if a planner needs to add a new "Vertical" (e.g., adding "Drones" to the existing list in Verticals_Sectors), they simply modify the input list. The engine then dynamically reconstructs all dependent tables across the model, propagating the change without manual error.
+Service Demand: Study Years, Regions, Verticals_Sectors.
+
+Dimensioning Logic: Throughput Formulas, Output Formulas.
 
 3.3 Functional Components and Input Structure
 
