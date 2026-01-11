@@ -22,6 +22,7 @@ Public hasFormatOnly As Boolean
 
 ' End of InputCells.cls
 
+
 ' Start of OffsetReturnData.cls
 
 VERSION 1.0 CLASS
@@ -38,6 +39,7 @@ Public currentRowOffset As Long
 
 ' End of OffsetReturnData.cls
 
+
 ' Start of SheetData.cls
 
 VERSION 1.0 CLASS
@@ -53,6 +55,7 @@ Public changedRows As New Scripting.Dictionary
 Public changedColumns As New Scripting.Dictionary
 
 ' End of SheetData.cls
+
 
 ' Start of StringBuilder.cls
 
@@ -114,7 +117,8 @@ End Function
 
 ' End of StringBuilder.cls
 
-' Start of TableSerData.cls
+
+' Start of TableSetData.cls
 
 VERSION 1.0 CLASS
 BEGIN

@@ -59,6 +59,6 @@ Function SetConfigSheet()
     Set configSheet = ThisWorkbook.Sheets("Model Configurator")
     On Error GoTo 0
     If configSheet Is Nothing Then
-        Set configSheet = ModelConfigurator 
+        Set configSheet = ModelConfigurator
     End If
 End Function

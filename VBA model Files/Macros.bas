@@ -1,6 +1,5 @@
 Attribute VB_Name = "Macros"
 Sub ShowAllSheets()
-Attribute ShowAllSheets.VB_ProcData.VB_Invoke_Func = "r\n14"
 If ActiveWorkbook.Sheets.Count > 15 Then
     Application.CommandBars("Workbook tabs").Controls("More Sheets...").Execute
 Else
@@ -9,12 +8,10 @@ End If
 End Sub
 
 Sub AllCaps()
-Attribute AllCaps.VB_ProcData.VB_Invoke_Func = "e\n14"
     For Each myCell In Selection.Cells: myCell.Value = UCase(myCell.Value): Next
 End Sub
 
 Sub UpdateSheetsList()
-Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
     
     Dim mCSup As Worksheet
     Dim i As Integer
@@ -32,7 +29,6 @@ Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
     End If
 
     FIRST_SHEET_INDEX = mCSup.Cells(SpAddresses.SheetsListStartR, SpAddresses.SheetsListStartC).Value
-    
     
     tableRow = mCSup.ListObjects("Table_SheetList").range.row
     tableColumn = mCSup.ListObjects("Table_SheetList").range.Column
@@ -62,7 +58,6 @@ Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
 End Sub
 
 Sub FillRandom()
-Attribute FillRandom.VB_ProcData.VB_Invoke_Func = "u\n14"
     For Each cell In Selection
     cell.Value = Int((30 * Rnd) + 5)
     Next
@@ -77,4 +72,5 @@ Sub DivideCellsByTwo()
         End If
     Next cell
 End Sub
+
 

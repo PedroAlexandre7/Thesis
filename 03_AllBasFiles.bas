@@ -61,11 +61,12 @@ Function SetConfigSheet()
     Set configSheet = ThisWorkbook.Sheets("Model Configurator")
     On Error GoTo 0
     If configSheet Is Nothing Then
-        Set configSheet = ModelConfigurator 
+        Set configSheet = ModelConfigurator
     End If
 End Function
 
 ' End of EnumesModule.bas
+
 
 ' Start of GetUserInput.bas
 
@@ -252,11 +253,11 @@ End Function
 
 ' End of GetUserInput.bas
 
+
 ' Start of Macro.bas
 
 Attribute VB_Name = "Macros"
 Sub ShowAllSheets()
-Attribute ShowAllSheets.VB_ProcData.VB_Invoke_Func = "r\n14"
 If ActiveWorkbook.Sheets.Count > 15 Then
     Application.CommandBars("Workbook tabs").Controls("More Sheets...").Execute
 Else
@@ -265,12 +266,10 @@ End If
 End Sub
 
 Sub AllCaps()
-Attribute AllCaps.VB_ProcData.VB_Invoke_Func = "e\n14"
     For Each myCell In Selection.Cells: myCell.Value = UCase(myCell.Value): Next
 End Sub
 
 Sub UpdateSheetsList()
-Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
     
     Dim mCSup As Worksheet
     Dim i As Integer
@@ -288,7 +287,6 @@ Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
     End If
 
     FIRST_SHEET_INDEX = mCSup.Cells(SpAddresses.SheetsListStartR, SpAddresses.SheetsListStartC).Value
-    
     
     tableRow = mCSup.ListObjects("Table_SheetList").range.row
     tableColumn = mCSup.ListObjects("Table_SheetList").range.Column
@@ -318,7 +316,6 @@ Attribute UpdateSheetsList.VB_ProcData.VB_Invoke_Func = "t\n14"
 End Sub
 
 Sub FillRandom()
-Attribute FillRandom.VB_ProcData.VB_Invoke_Func = "u\n14"
     For Each cell In Selection
     cell.Value = Int((30 * Rnd) + 5)
     Next
@@ -876,45 +873,7 @@ Function setHeightAndWidth(objtype As InstructionType, cellToModify As range, ce
         cellToModify.ColumnWidth = cellWithData.ColumnWidth
         changedColumns.Item(cellToModify.Column) = cellWithData.ColumnWidth
     End If
-
-    '    If (objtype = Header) Then
-    '        ' The first column of a Header Input will set it's height.
-    '        If ( Not changedRows.Exists(cellToModify.row)) Then
-    '            cellToModify.RowHeight = cellWithData.RowHeight
-    '            changedRows.Add cellToModify.row, cellWithData.RowHeight
-    '            ' Asserts that if there is no Column's Input the first column as it's width set.
-    '            ' Width isn't recorded so that a column may change it if there is one.
-    '            If ( Not changedColumns.Exists(cellToModify.Column)) Then
-    '                cellToModify.ColumnWidth = cellWithData.ColumnWidth
-    '                'changedColumns.Add cellToModify.Column, cellToModify.Column ' This may cause problems, but ignore for now
-    '            End If
-    '            ' The other columns set their width
-    '        ElseIf ( Not changedColumns.Exists(cellToModify.Column)) Then
-    '            cellToModify.ColumnWidth = cellWithData.ColumnWidth
-    '            changedColumns.Add cellToModify.Column, cellWithData.ColumnWidth
-    '        End If
-    '    ElseIf (objtype = Column) Then
-    '        'The first row of a Column Input set's the column's width and it's own height
-    '        If ( Not changedColumns.Exists(cellToModify.Column)) Then
-    '            cellToModify.ColumnWidth = cellWithData.ColumnWidth
-    '            changedColumns.Add cellToModify.Column, cellWithData.ColumnWidth
-    '        End If
-    '        ' The other rows set their height
-    '        If ( Not changedRows.Exists(cellToModify.row)) Then
-    '            cellToModify.RowHeight = cellWithData.RowHeight
-    '            changedRows.Add cellToModify.row, cellWithData.RowHeight
-    '        End If
-    '        ' A Title only records it's height, it's width will usualy depend from headers that are bellow.
-    '    ElseIf (objtype = Title And Not changedRows.Exists(cellToModify.row)) Then
-    '        cellToModify.RowHeight = cellWithData.RowHeight
-    '        changedRows.Add cellToModify.row, cellWithData.RowHeight
-    '        If ( Not changedColumns.Exists(cellToModify.Column)) Then
-    '            cellToModify.ColumnWidth = cellWithData.ColumnWidth
-    '        End If
-    '    End If
 End Function
-
-
 
 ' GetSize function calculates the size of the input range based on the specified parameters
 Function GetSize(inputSheet As Worksheet, firstCell As range, width As Long, maxSize As Long, objtype As InstructionType) As Long
