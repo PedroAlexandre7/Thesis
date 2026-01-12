@@ -1,4 +1,4 @@
-Chapter 3: Implementation - The Artifact
+Chapter 3: The Artifact: A Declarative IoT Dimensioning Model
 
 3.1 Overview and Design Philosophy
 
@@ -21,16 +21,20 @@ Assumption-Driven: Facilitating rapid "first-pass" dimensioning by allowing plan
 The artifact functions as a layered application built within the Microsoft Excel environment. It is architected around three distinct layers, as illustrated in the system design:
 
 3.2.1 The Configuration Layer (The "Blueprints")
-The entry point for the planner is the Model Configurator sheet. This sheet acts as a domain-specific language (DSL) where the user defines the "Instructions" for the model. As seen in the tool's interface, this layer accepts abstract commands such as:
+The entry point for the planner is the Model Configurator sheet. This sheet acts as a domain-specific language (DSL) where the user defines the "Instructions" for the model. As seen in the tool's interface, this layer accepts the following abstract commands:
 
-Title: Groups data by logical entities (e.g., "Regions").
+Output: Designates the target sheets for generating calculation tables. It acts as the container definition, instructing the engine where to place the data blocks.
 
-Years: Defines the temporal scope (e.g., 2023, 2025, 2030), automatically expanding the model's timeline.
+Title: Groups data by logical entities (e.g., "Regions"). This instruction triggers the iterative generation of tables, ensuring that a separate analysis block is created for every defined entity (e.g., creating a table for "Central Coast", "Cessnock", etc.).
 
-Output: Designates the target sheets for generating calculation tables.
+Years: Defines the temporal scope (e.g., 2023, 2025, 2030). This instruction controls the time-dimension expansion, automatically replicating columns or sheets to accommodate the defined planning horizon.
 
-3.2.2 The Orchestration Layer (The "Engine")
-The logic core is a VBA-based automation backend that reads the Configuration Layer and algorithmically builds the spreadsheet. This layer is encapsulated in the CreateTablesFromInput macro and relies on several custom classes (verified in the codebase 03_AllClsFiles.cls):
+Header: Defines the static horizontal structure of a table. It maps to specific row inputs (e.g., "Throughput", "Devices", "Cost") that form the column headers of the generated analysis tables.
+
+Column: Defines the vertical structure or data drivers. This instruction pulls lists from input sheets (e.g., the list of 15 "Verticals" or 10 "Base Station Types") to dynamically determine the height of the generated tables, ensuring the model adapts automatically if items are added to or removed from the source lists.
+
+3.2.2 The Automation Layer (The "Engine")
+The logic core is a VBA-based automation backend that reads the Configuration Layer and algorithmically builds the spreadsheet. This layer is encapsulated in the CreateTablesFromInput macro and relies on several custom classes and modules:
 
 InputCells Class: An object representing a block of user inputs (e.g., a table of device densities). It stores metadata such as rowShift and columnShift, allowing the engine to place data dynamically without hard-coded cell references.
 

@@ -83,7 +83,7 @@ Function GetTableSetData(row As Long) As TableSetData
     obj.columnShift = GetInt(configSheet.Cells(row, InstructionSetting.columnShift), 0)
     obj.createSheets = IIf(Len(configSheet.Cells(row, InstructionSetting.createSheets).Value) = 0, False, True)
     If Len(configSheet.Cells(row, InstructionSetting.CopyOutputHeader).Value) <> 0 Then
-        Set obj.sheetHeader = New InputCells
+        Set obj.sheetHeader = New InputData
         Set obj.sheetHeader.range = obj.sheet.range(obj.sheet.Cells(1, 1), obj.sheet.Cells(6, obj.sheet.Cells(1, 15000).End(xlToRight).Column)) ' Just to copy the header format when creating new sheets
         obj.sheetHeader.iType = InstructionType.Header
         obj.sheetHeader.fixedFormulas = True
@@ -94,8 +94,8 @@ Function GetTableSetData(row As Long) As TableSetData
 End Function
 
 ' Retrieves the input cells and their properties from the configuration sheet for the specified row.
-Function GetInputCells(row As Long) As InputCells
-    Dim obj As New InputCells
+Function GetInputData(row As Long) As InputData
+    Dim obj As New InputData
     Dim sheet As Worksheet
     Dim firstCell As range
     Dim width As Long
@@ -129,13 +129,13 @@ Function GetInputCells(row As Long) As InputCells
     obj.fixedFormulas = IIf(Len(configSheet.Cells(row, InstructionSetting.FixedReferences).Value) = 0, False, True)
     obj.hasFormatOnly = IIf(Len(configSheet.Cells(row, InstructionSetting.hasFormatOnly).Value) = 0, False, True)
     Set obj.range = GetInput(sheet, firstCell, width, maxSize, obj.iType)
-    'Println vbCrLf & "    InputCells" & vbCrLf & "Type: " & EnumName(obj.iType) & vbCrLf & "Columns: " & obj.range.Columns.Count & " Rows: " & obj.range.Rows.Count & vbCrLf & "rowShift: " & obj.rowShift & vbCrLf & "LastIsTotal: " & obj.lastIsTotal & vbCrLf & "CountInTotal: " & obj.countInTotal & vbCrLf & "FixedFormulas: " & obj.fixedFormulas
-    Set GetInputCells = obj
+    'Println vbCrLf & "    InputData" & vbCrLf & "Type: " & EnumName(obj.iType) & vbCrLf & "Columns: " & obj.range.Columns.Count & " Rows: " & obj.range.Rows.Count & vbCrLf & "rowShift: " & obj.rowShift & vbCrLf & "LastIsTotal: " & obj.lastIsTotal & vbCrLf & "CountInTotal: " & obj.countInTotal & vbCrLf & "FixedFormulas: " & obj.fixedFormulas
+    Set GetInputData = obj
 End Function
 
 ' Retrieves the input cells and their properties from the configuration sheet for the specified row.
-Function GetStudyYears(row As Long) As InputCells
-    Dim obj As New InputCells
+Function GetStudyYears(row As Long) As InputData
+    Dim obj As New InputData
     Dim sheet As Worksheet
     Dim firstCell As range
     Dim maxSize As Long

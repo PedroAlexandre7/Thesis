@@ -13,8 +13,8 @@ Attribute CreateTablesFromInput.VB_ProcData.VB_Invoke_Func = "q\n14"
     Println "Creating Tables"
     
     Dim headersAndColumns As New Collection
-    Dim titleInput As New InputCells
-    Dim studyYears As New InputCells
+    Dim titleInput As New InputData
+    Dim studyYears As New InputData
     Dim tableSet As New TableSetData
     'Dim foundFirstCol As Boolean : foundFirstCol = False
     Dim row As Long
@@ -39,11 +39,11 @@ Attribute CreateTablesFromInput.VB_ProcData.VB_Invoke_Func = "q\n14"
     For row = row To lastRow
         Select Case GetType(configSheet.Cells(row, InstructionSetting.InstructionType).Value)
             Case InstructionType.Header
-                headersAndColumns.Add GetInputCells(row)
+                headersAndColumns.Add GetInputData(row)
             Case Column
-                headersAndColumns.Add GetInputCells(row)
+                headersAndColumns.Add GetInputData(row)
             Case Title
-                Set titleInput = GetInputCells(row)
+                Set titleInput = GetInputData(row)
             Case years
                 Set studyYears = GetStudyYears(row)
             Case InstructionType.Output
@@ -88,7 +88,7 @@ Function RestoreStateAndEnd()
 End Function
 
 ' Creates the tables in the specified output sheet based on the provided inputs and configuration.
-Sub CreateTables(tableSet As TableSetData, studyYears As InputCells, ByVal titleInput As InputCells, headersAndColumns As Collection)
+Sub CreateTables(tableSet As TableSetData, studyYears As InputData, ByVal titleInput As InputData, headersAndColumns As Collection)
     ' Support Variables
     Dim hiddenSheet As Worksheet
     Dim currentRowOffset As Long
@@ -174,7 +174,7 @@ Sub ClearData(hasToClearData As Boolean, sheet As Worksheet)
 End Sub
 
 ' Creates tables for each year based on the provided inputs and configuration.
-Function CreateTablesForEachTitle(tableSet As TableSetData, ByVal titleInput As InputCells, headersAndColumns As Collection, currentRowOffset As Long, Optional currentColumnOffset As Long = 0, Optional studyYears As InputCells = Nothing, Optional row As Long = 1) As Long
+Function CreateTablesForEachTitle(tableSet As TableSetData, ByVal titleInput As InputData, headersAndColumns As Collection, currentRowOffset As Long, Optional currentColumnOffset As Long = 0, Optional studyYears As InputData = Nothing, Optional row As Long = 1) As Long
     Dim k As Long
     Dim returnedOffsetData As OffsetReturnData
     Dim maxColumnCount As Long: maxColumnCount = 0
@@ -209,7 +209,7 @@ End Function
 Sub PutInputInATempSheet(tableSet As TableSetData, headersAndColumns As Collection, hiddenSheet As Worksheet)
     Dim rowOffset As Long: rowOffset = 500000
     Dim columnOffset As Long: columnOffset = 8000
-    Dim inputO As InputCells
+    Dim inputO As InputData
     
     Set changedRows = New Scripting.Dictionary
     Set changedColumns = New Scripting.Dictionary
@@ -241,13 +241,13 @@ End Sub
 Function CreateHeadersAndColumns(tableSet As TableSetData, headersAndColumns As Collection, currentRowOffset As Long, currentColumnOffset As Long, Optional spaceForTitle As Integer = 0) As OffsetReturnData
     Dim columnHeightToAdd As Long: columnHeightToAdd = 0  ' Makes sure when writing next Headers, they start after the columns.
     Dim offsetData As OffsetReturnData: Set offsetData = New OffsetReturnData
-    Dim nextColumn As InputCells
+    Dim nextColumn As InputData
     Dim firstCell As range
     Dim lastHeader As range
     Dim rangeToFill As range
     
     For i = 1 To headersAndColumns.Count
-        Dim obj As InputCells: Set obj = headersAndColumns(i)
+        Dim obj As InputData: Set obj = headersAndColumns(i)
         If obj.iType = Header Then
             ' Fill in Headers
             offsetData.maxColumnCount = WorksheetFunction.Max(offsetData.maxColumnCount, obj.range.Columns.Count + obj.columnShift + spaceForTitle)
@@ -310,7 +310,7 @@ Sub FillTotal(objtype As InstructionType, rangeToFill As range, sumRange As Long
 End Sub
 
 ' Copies the specified input cells to the output sheet at the given offsets, adjusting formulas and dimensions as needed.
-Function CopyCells(outputSheet As Worksheet, obj As InputCells, currentRowOffset As Long, columnOffset As Long, Optional row As Long = -1, Optional saveRowHeight As Boolean = True, Optional saveColumnWidth As Boolean = True) As range
+Function CopyCells(outputSheet As Worksheet, obj As InputData, currentRowOffset As Long, columnOffset As Long, Optional row As Long = -1, Optional saveRowHeight As Boolean = True, Optional saveColumnWidth As Boolean = True) As range
     Dim objRange As range
     If row = -1 Then
         Set objRange = obj.range

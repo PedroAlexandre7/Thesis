@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Public sheet As Worksheet
 Public iType As InstructionType
-Public sheetHeader As InputCells
+Public sheetHeader As InputData
 Public firstRow As Long
 Public firstColumn As Long
 Public columnShift As Long

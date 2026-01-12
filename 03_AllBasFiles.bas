@@ -155,7 +155,7 @@ Function GetTableSetData(row As Long) As TableSetData
     obj.columnShift = GetInt(configSheet.Cells(row, InstructionSetting.columnShift), 0)
     obj.createSheets = IIf(Len(configSheet.Cells(row, InstructionSetting.createSheets).Value) = 0, False, True)
     If Len(configSheet.Cells(row, InstructionSetting.CopyOutputHeader).Value) <> 0 Then
-        Set obj.sheetHeader = New InputCells
+        Set obj.sheetHeader = New InputData
         Set obj.sheetHeader.range = obj.sheet.range(obj.sheet.Cells(1, 1), obj.sheet.Cells(6, obj.sheet.Cells(1, 15000).End(xlToRight).Column)) ' Just to copy the header format when creating new sheets
         obj.sheetHeader.iType = InstructionType.Header
         obj.sheetHeader.fixedFormulas = True
@@ -166,8 +166,8 @@ Function GetTableSetData(row As Long) As TableSetData
 End Function
 
 ' Retrieves the input cells and their properties from the configuration sheet for the specified row.
-Function GetInputCells(row As Long) As InputCells
-    Dim obj As New InputCells
+Function GetInputData(row As Long) As InputData
+    Dim obj As New InputData
     Dim sheet As Worksheet
     Dim firstCell As range
     Dim width As Long
@@ -201,13 +201,13 @@ Function GetInputCells(row As Long) As InputCells
     obj.fixedFormulas = IIf(Len(configSheet.Cells(row, InstructionSetting.FixedReferences).Value) = 0, False, True)
     obj.hasFormatOnly = IIf(Len(configSheet.Cells(row, InstructionSetting.hasFormatOnly).Value) = 0, False, True)
     Set obj.range = GetInput(sheet, firstCell, width, maxSize, obj.iType)
-    'Println vbCrLf & "    InputCells" & vbCrLf & "Type: " & EnumName(obj.iType) & vbCrLf & "Columns: " & obj.range.Columns.Count & " Rows: " & obj.range.Rows.Count & vbCrLf & "rowShift: " & obj.rowShift & vbCrLf & "LastIsTotal: " & obj.lastIsTotal & vbCrLf & "CountInTotal: " & obj.countInTotal & vbCrLf & "FixedFormulas: " & obj.fixedFormulas
-    Set GetInputCells = obj
+    'Println vbCrLf & "    InputData" & vbCrLf & "Type: " & EnumName(obj.iType) & vbCrLf & "Columns: " & obj.range.Columns.Count & " Rows: " & obj.range.Rows.Count & vbCrLf & "rowShift: " & obj.rowShift & vbCrLf & "LastIsTotal: " & obj.lastIsTotal & vbCrLf & "CountInTotal: " & obj.countInTotal & vbCrLf & "FixedFormulas: " & obj.fixedFormulas
+    Set GetInputData = obj
 End Function
 
 ' Retrieves the input cells and their properties from the configuration sheet for the specified row.
-Function GetStudyYears(row As Long) As InputCells
-    Dim obj As New InputCells
+Function GetStudyYears(row As Long) As InputData
+    Dim obj As New InputData
     Dim sheet As Worksheet
     Dim firstCell As range
     Dim maxSize As Long
@@ -256,86 +256,6 @@ End Function
 
 ' Start of Macro.bas
 
-Attribute VB_Name = "Macros"
-Sub ShowAllSheets()
-If ActiveWorkbook.Sheets.Count > 15 Then
-    Application.CommandBars("Workbook tabs").Controls("More Sheets...").Execute
-Else
-  Application.CommandBars("Workbook tabs").ShowPopup
-End If
-End Sub
-
-Sub AllCaps()
-    For Each myCell In Selection.Cells: myCell.Value = UCase(myCell.Value): Next
-End Sub
-
-Sub UpdateSheetsList()
-    
-    Dim mCSup As Worksheet
-    Dim i As Integer
-    Dim FIRST_SHEET_INDEX As Integer
-    Dim tableSheetsCount As Integer
-    Dim sheetsCount As Integer
-    Dim tableRow As Integer
-    Dim tableColumn As Integer
-    
-    On Error Resume Next
-    Set mCSup = ThisWorkbook.Sheets("Model Configurator Sup")
-    On Error GoTo 0
-    If mCSup Is Nothing Then
-        Set mCSup = ModelConfiguratorSup
-    End If
-
-    FIRST_SHEET_INDEX = mCSup.Cells(SpAddresses.SheetsListStartR, SpAddresses.SheetsListStartC).Value
-    
-    tableRow = mCSup.ListObjects("Table_SheetList").range.row
-    tableColumn = mCSup.ListObjects("Table_SheetList").range.Column
-    tableSheetsCount = mCSup.ListObjects("Table_SheetList").range.Rows.Count - 1 ' to not count with header
-    sheetsCount = ThisWorkbook.Sheets.Count - FIRST_SHEET_INDEX ' to count starting from Inputs >>
-
-    ' Delete excess rows
-    If sheetsCount < tableSheetsCount Then
-        Dim j
-        Dim cellsToDelete As range:
-        Dim cellsCount As Integer
-        
-        Set cellsToDelete = mCSup.range(mCSup.Cells(tableRow + sheetsCount, tableColumn), mCSup.Cells(tableRow, tableColumn).End(xlDown))
-        cellsCount = cellsToDelete.Rows.Count
-        
-        For j = 1 To cellsCount
-            cellsToDelete.Cells(cellsCount + 1 - j, 1).Delete
-        Next j
-        
-    End If
-    
-    ' Write numbers
-    For i = 1 To sheetsCount
-        mCSup.Cells(tableRow + i, tableColumn) = ThisWorkbook.Sheets(FIRST_SHEET_INDEX + i).Name
-    Next i
-        
-End Sub
-
-Sub FillRandom()
-    For Each cell In Selection
-    cell.Value = Int((30 * Rnd) + 5)
-    Next
-End Sub
-
-
-Sub DivideCellsByTwo()
-    Dim cell As range
-    For Each cell In Selection
-        If IsNumeric(cell.Value) And Not IsEmpty(cell.Value) Then
-            cell.Value = cell.Value / 2
-        End If
-    Next cell
-End Sub
-
-' End of Macro.bas
-
-
-' Start of Main.bas
-
 Attribute VB_Name = "Main"
 ' Main module that calls the creation of tables based on user input and configuration.
 Sub CreateTablesFromInput()
@@ -351,8 +271,8 @@ Attribute CreateTablesFromInput.VB_ProcData.VB_Invoke_Func = "q\n14"
     Println "Creating Tables"
     
     Dim headersAndColumns As New Collection
-    Dim titleInput As New InputCells
-    Dim studyYears As New InputCells
+    Dim titleInput As New InputData
+    Dim studyYears As New InputData
     Dim tableSet As New TableSetData
     'Dim foundFirstCol As Boolean : foundFirstCol = False
     Dim row As Long
@@ -377,11 +297,11 @@ Attribute CreateTablesFromInput.VB_ProcData.VB_Invoke_Func = "q\n14"
     For row = row To lastRow
         Select Case GetType(configSheet.Cells(row, InstructionSetting.InstructionType).Value)
             Case InstructionType.Header
-                headersAndColumns.Add GetInputCells(row)
+                headersAndColumns.Add GetInputData(row)
             Case Column
-                headersAndColumns.Add GetInputCells(row)
+                headersAndColumns.Add GetInputData(row)
             Case Title
-                Set titleInput = GetInputCells(row)
+                Set titleInput = GetInputData(row)
             Case years
                 Set studyYears = GetStudyYears(row)
             Case InstructionType.Output
@@ -426,7 +346,7 @@ Function RestoreStateAndEnd()
 End Function
 
 ' Creates the tables in the specified output sheet based on the provided inputs and configuration.
-Sub CreateTables(tableSet As TableSetData, studyYears As InputCells, ByVal titleInput As InputCells, headersAndColumns As Collection)
+Sub CreateTables(tableSet As TableSetData, studyYears As InputData, ByVal titleInput As InputData, headersAndColumns As Collection)
     ' Support Variables
     Dim hiddenSheet As Worksheet
     Dim currentRowOffset As Long
@@ -512,7 +432,7 @@ Sub ClearData(hasToClearData As Boolean, sheet As Worksheet)
 End Sub
 
 ' Creates tables for each year based on the provided inputs and configuration.
-Function CreateTablesForEachTitle(tableSet As TableSetData, ByVal titleInput As InputCells, headersAndColumns As Collection, currentRowOffset As Long, Optional currentColumnOffset As Long = 0, Optional studyYears As InputCells = Nothing, Optional row As Long = 1) As Long
+Function CreateTablesForEachTitle(tableSet As TableSetData, ByVal titleInput As InputData, headersAndColumns As Collection, currentRowOffset As Long, Optional currentColumnOffset As Long = 0, Optional studyYears As InputData = Nothing, Optional row As Long = 1) As Long
     Dim k As Long
     Dim returnedOffsetData As OffsetReturnData
     Dim maxColumnCount As Long: maxColumnCount = 0
@@ -547,7 +467,7 @@ End Function
 Sub PutInputInATempSheet(tableSet As TableSetData, headersAndColumns As Collection, hiddenSheet As Worksheet)
     Dim rowOffset As Long: rowOffset = 500000
     Dim columnOffset As Long: columnOffset = 8000
-    Dim inputO As InputCells
+    Dim inputO As InputData
     
     Set changedRows = New Scripting.Dictionary
     Set changedColumns = New Scripting.Dictionary
@@ -579,13 +499,13 @@ End Sub
 Function CreateHeadersAndColumns(tableSet As TableSetData, headersAndColumns As Collection, currentRowOffset As Long, currentColumnOffset As Long, Optional spaceForTitle As Integer = 0) As OffsetReturnData
     Dim columnHeightToAdd As Long: columnHeightToAdd = 0  ' Makes sure when writing next Headers, they start after the columns.
     Dim offsetData As OffsetReturnData: Set offsetData = New OffsetReturnData
-    Dim nextColumn As InputCells
+    Dim nextColumn As InputData
     Dim firstCell As range
     Dim lastHeader As range
     Dim rangeToFill As range
     
     For i = 1 To headersAndColumns.Count
-        Dim obj As InputCells: Set obj = headersAndColumns(i)
+        Dim obj As InputData: Set obj = headersAndColumns(i)
         If obj.iType = Header Then
             ' Fill in Headers
             offsetData.maxColumnCount = WorksheetFunction.Max(offsetData.maxColumnCount, obj.range.Columns.Count + obj.columnShift + spaceForTitle)
@@ -648,7 +568,7 @@ Sub FillTotal(objtype As InstructionType, rangeToFill As range, sumRange As Long
 End Sub
 
 ' Copies the specified input cells to the output sheet at the given offsets, adjusting formulas and dimensions as needed.
-Function CopyCells(outputSheet As Worksheet, obj As InputCells, currentRowOffset As Long, columnOffset As Long, Optional row As Long = -1, Optional saveRowHeight As Boolean = True, Optional saveColumnWidth As Boolean = True) As range
+Function CopyCells(outputSheet As Worksheet, obj As InputData, currentRowOffset As Long, columnOffset As Long, Optional row As Long = -1, Optional saveRowHeight As Boolean = True, Optional saveColumnWidth As Boolean = True) As range
     Dim objRange As range
     If row = -1 Then
         Set objRange = obj.range
@@ -873,7 +793,45 @@ Function setHeightAndWidth(objtype As InstructionType, cellToModify As range, ce
         cellToModify.ColumnWidth = cellWithData.ColumnWidth
         changedColumns.Item(cellToModify.Column) = cellWithData.ColumnWidth
     End If
+
+    '    If (objtype = Header) Then
+    '        ' The first column of a Header Input will set it's height.
+    '        If ( Not changedRows.Exists(cellToModify.row)) Then
+    '            cellToModify.RowHeight = cellWithData.RowHeight
+    '            changedRows.Add cellToModify.row, cellWithData.RowHeight
+    '            ' Asserts that if there is no Column's Input the first column as it's width set.
+    '            ' Width isn't recorded so that a column may change it if there is one.
+    '            If ( Not changedColumns.Exists(cellToModify.Column)) Then
+    '                cellToModify.ColumnWidth = cellWithData.ColumnWidth
+    '                'changedColumns.Add cellToModify.Column, cellToModify.Column ' This may cause problems, but ignore for now
+    '            End If
+    '            ' The other columns set their width
+    '        ElseIf ( Not changedColumns.Exists(cellToModify.Column)) Then
+    '            cellToModify.ColumnWidth = cellWithData.ColumnWidth
+    '            changedColumns.Add cellToModify.Column, cellWithData.ColumnWidth
+    '        End If
+    '    ElseIf (objtype = Column) Then
+    '        'The first row of a Column Input set's the column's width and it's own height
+    '        If ( Not changedColumns.Exists(cellToModify.Column)) Then
+    '            cellToModify.ColumnWidth = cellWithData.ColumnWidth
+    '            changedColumns.Add cellToModify.Column, cellWithData.ColumnWidth
+    '        End If
+    '        ' The other rows set their height
+    '        If ( Not changedRows.Exists(cellToModify.row)) Then
+    '            cellToModify.RowHeight = cellWithData.RowHeight
+    '            changedRows.Add cellToModify.row, cellWithData.RowHeight
+    '        End If
+    '        ' A Title only records it's height, it's width will usualy depend from headers that are bellow.
+    '    ElseIf (objtype = Title And Not changedRows.Exists(cellToModify.row)) Then
+    '        cellToModify.RowHeight = cellWithData.RowHeight
+    '        changedRows.Add cellToModify.row, cellWithData.RowHeight
+    '        If ( Not changedColumns.Exists(cellToModify.Column)) Then
+    '            cellToModify.ColumnWidth = cellWithData.ColumnWidth
+    '        End If
+    '    End If
 End Function
+
+
 
 ' GetSize function calculates the size of the input range based on the specified parameters
 Function GetSize(inputSheet As Worksheet, firstCell As range, width As Long, maxSize As Long, objtype As InstructionType) As Long
