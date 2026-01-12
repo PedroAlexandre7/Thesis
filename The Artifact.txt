@@ -23,24 +23,32 @@ The artifact functions as a layered application built within the Microsoft Excel
 3.2.1 The Configuration Layer (The "Blueprints")
 The entry point for the planner is the Model Configurator sheet. This sheet acts as a domain-specific language (DSL) where the user defines the "Instructions" for the model. As seen in the tool's interface, this layer accepts the following abstract commands:
 
-Output: Designates the target sheets for generating calculation tables. It acts as the container definition, instructing the engine where to place the data blocks.
+Years: Defines the temporal scope (e.g., 2023, 2025, 2030). This instruction controls the time-dimension expansion, automatically replicating columns or sheets to accommodate the defined planning horizon.
 
 Title: Groups data by logical entities (e.g., "Regions"). This instruction triggers the iterative generation of tables, ensuring that a separate analysis block is created for every defined entity (e.g., creating a table for "Central Coast", "Cessnock", etc.).
-
-Years: Defines the temporal scope (e.g., 2023, 2025, 2030). This instruction controls the time-dimension expansion, automatically replicating columns or sheets to accommodate the defined planning horizon.
 
 Header: Defines the static horizontal structure of a table. It maps to specific row inputs (e.g., "Throughput", "Devices", "Cost") that form the column headers of the generated analysis tables.
 
 Column: Defines the vertical structure or data drivers. This instruction pulls lists from input sheets (e.g., the list of 15 "Verticals" or 10 "Base Station Types") to dynamically determine the height of the generated tables, ensuring the model adapts automatically if items are added to or removed from the source lists.
 
+Output: Designates the target sheet for the analysis tables. In the logic of the DSL, this command functions as a block terminator; it signals that the preceding collection of instructions (headers, columns, etc.) constitutes a complete set and directs the engine to render the results in the specified worksheet.
+
 3.2.2 The Automation Layer (The "Engine")
-The logic core is a VBA-based automation backend that reads the Configuration Layer and algorithmically builds the spreadsheet. This layer is encapsulated in the CreateTablesFromInput macro and relies on several custom classes and modules:
+The logic core is a VBA-based automation backend that reads the Configuration Layer and algorithmically builds the spreadsheet. This layer abstracts the complexity of Excel's object model into structured classes, ensuring that the dimensioning logic is robust and maintainable.
 
-InputCells Class: An object representing a block of user inputs (e.g., a table of device densities). It stores metadata such as rowShift and columnShift, allowing the engine to place data dynamically without hard-coded cell references.
+3.2.2.1 Object-Oriented Data Structures
+To manage the translation between user intent and spreadsheet cells, the artifact utilizes two primary custom classes that encapsulate the model's metadata:
 
-TableSetData Class: Manages the properties of the output sheets, determining if data should be cleared, preserved, or if new sheets need to be generated for each study year.
+InputData Class (The Input Abstraction):
+This class serves as the primary abstraction for user-defined model inputs, encapsulating both the raw data source and its associated processing logic. Unlike static range references, an InputData object functions as a polymorphic entity that adapts its behavior based on the assigned InstructionType. It distinguishes between structural components—such as Headers (defining horizontal fields) and Columns (defining vertical drivers) and dimensional components like Years (controlling temporal expansion) and Titles (managing iterative grouping). Furthermore, the class maintains spatial awareness through properties like rowShift and columnShift, allowing the automation engine to dynamically compute the relative positioning of data blocks. This design decouples the data definition from its physical location, enabling the flexible, algorithmic construction of complex dimensioning tables.
 
-Main Module: The execution loop that iterates through the configuration instructions. It detects the instruction type (e.g., Header, Column, Output) and calls the CreateTables subroutine to render the content.
+TableSetData Class (The Output Context):
+Complementing the input abstraction, the TableSetData class functions as the metadata container for the output. It does not handle the data logic itself but rather defines the structural context for the set of instructions. When an output block is processed, this object captures the essential properties of the destination, specifically the target worksheet, the starting coordinates (firstRow, firstColumn), and data management rules (e.g., ClearData). It effectively provides the "canvas" metadata upon which the various InputData objects are rendered.
+
+3.2.2.2 The Execution Loop (Main Module)
+The orchestration of these objects is handled by the Main module, specifically the CreateTablesFromInput routine. This procedure functions as a linear interpreter for the configuration DSL.
+
+Rather than executing ad-hoc operations, the main module iterates strictly through the instructions defined in the Configuration Layer. Its primary goal is to parse the linear list of commands into structured collections of InputData objects. By systematically identifying the instruction type, it accumulates "construction materials" (Years, Titles, Headers, Columns) until it reaches an Output command. At that point, it delegates the complex rendering logic to the CreateTables subroutine, which uses the TableSetData context to stamp the accumulated logic into the workbook. This separation of concerns ensures that the core loop remains focused on the flow of the dimensioning process, while the detailed manipulation of Excel ranges is delegated to specialized subroutines that act upon the metadata encapsulated in these classes.
 
 3.2.3 The Data Layer (The "Interface")
 The final layer consists of the generated Input and Output sheets where the actual planning occurs. These sheets are categorized into:
