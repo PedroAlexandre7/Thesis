@@ -51,13 +51,46 @@ The orchestration of these objects is handled by the Main module, specifically t
 The execution flow operates as a linear interpreter for the configuration DSL. The Main routine iterates through the instruction list, parsing each row into an InputData object. It accumulates these objects into collections until an Output command is detected. At this trigger point, the engine calls specialized subroutines—such as CreateTables, CreateHeadersAndColumns, and CopyCells. These subroutines consume the TableSetData and InputData objects as arguments, reading their properties to determine exactly where to paste ranges, how to adjust formula references, and how to format the destination cells. This architecture strictly separates the definition of the data (Classes) from the manipulation of the spreadsheet (Modules), resulting in a robust and auditable build process.
 
 3.2.3 The Data Layer (The "Interface")
-The final layer consists of the generated Input and Output sheets where the actual planning occurs. These sheets are categorized into:
+The Data Layer constitutes the interactive frontend of the framework, comprising the generated input and output sheets where the planner performs the dimensioning tasks. It is crucial to emphasize that the specific sheet structure described in this section is not intrinsic to the tool's code but is a product of the configuration defined in the Model Configurator. While the framework is agnostic to the specific use case, for the purpose of this thesis, the artifact has been instantiated with data representing an Australian Smart City network (e.g., Central Coast, Cessnock). This dataset serves as a validation case study, demonstrating how the generic template can be adapted to specific regional requirements. The user retains the flexibility to divide and analyze the network using different components or sections by simply modifying the configuration inputs.
 
-Network Supply: Base Stations Sites, Base Stations Profiles.
+3.2.3.1 Dimensions and Analysis Scope
+The foundation of the model is built upon three primary dimensions that define the granularity and scope of the analysis. These sheets act as the coordinates for the calculation matrices:
 
-Service Demand: Study Years, Regions, Verticals_Sectors.
+Study Years: This sheet establishes the temporal horizon of the project (e.g., 2023, 2025). It is critical for analyzing the network dimensioning evolution over time, allowing the planner to ensure that the proposed infrastructure remains sufficient as demand grows. While this dimension also supports cost analysis, the primary focus is on technical validation throughout the project lifecycle.
 
-Dimensioning Logic: Throughput Formulas, Output Formulas.
+Regions: Defines the spatial segmentation of the analysis.
+
+Verticals_Sectors: Establishes the service taxonomy, categorizing the various use cases (e.g., "Utilities", "Public Safety") that will drive the network load.
+
+3.2.3.2 Traffic Generation and Network Configuration
+This section details the sheets that contain the core logic for calculating demand and defining the network supply. The workflow proceeds from traffic aggregation to infrastructure mapping:
+
+Traffic Calculation (Throughput & Throughput Formulas & Network Parameters):
+The quantification of network demand occurs in the Throughput sheet. This sheet acts as the primary input interface where the planner enters device counts and defines specific traffic attributes for each vertical (based on the taxonomy defined in Verticals_Sectors). The underlying structure and calculation logic - including the aggregation of traffic profiles - are defined in the Throughput Formulas template. This separation allows the model to enforce a consistent calculation methodology across different scenarios while providing a distinct interface for data entry. Global assumptions from Network Parameters (e.g., "Busy Hour Contention Ratio") are applied here to convert raw device counts into dimensioning-relevant metrics.
+
+Infrastructure Definition (Base Stations Sites & Base Stations Profiles):
+The technological capabilities of the network are defined here. Base Stations Sites serves as a catalog of the available technology types (e.g., "Standalone 5G", "LoRaWAN"), while Base Stations Profiles specifies the performance attributes of each type, such as maximum active users and downlink throughput.
+
+Siting Logic (Sites per Region):
+This sheet functions as the primary control variable for the dimensioning exercise. Here, a user-defined site distribution is mapped. This infrastructure layout does not necessarily reflect an existing deployment; rather, it allows the user to propose a baseline quantity of sites per region. The logic serves to feed the saturation analysis - by establishing a supply baseline, the model can later identify capacity gaps and calculate the remedial "Sites to Cover" in the output phase.
+
+3.2.3.3 The Physics Engine: Base Stations Parameters
+The Base Stations Parameters sheet functions as the physics engine of the artifact, validating the technical feasibility of the network supply. Unlike the capacity sheets which deal in traffic volumes, this sheet handles the radio frequency (RF) characteristics required to establish a valid link. It operationalizes two critical theoretical models:
+
+Shannon-Hartley Capacity: The sheet calculates the theoretical maximum throughput for each site type using the spectral efficiency formula. Inputs such as Bandwidth (MHz), MIMO layers, and Signal-to-Noise Ratio (SNR) are combined to derive the data rate limit ($C$), ensuring that the capacity values used in the dimensioning are grounded in physical reality rather than arbitrary estimates.
+
+Link Budget and Path Loss: To validate coverage, the sheet implements a link budget calculation. It accounts for Transmit Power ($P_{tx}$), Antenna Gains ($G$), and Losses ($L$) to determine the Received Signal Power. Furthermore, it incorporates logarithmic path loss models (aligned with standard 3GPP propagation models) dependent on carrier frequency (e.g., 800 MHz vs. 26 GHz) and base station height. This allows the model to estimate the maximum effective radius of a cell, providing a "sanity check" to ensure that the number of sites proposed for capacity reasons is also sufficient to provide geographical coverage.
+
+3.2.3.4 The Analytical Core: Output Formulas and Model Output
+The synthesis of Demand and Supply occurs in the Output Formulas and Model Output sheets. These components represent the analytical core of the framework.
+
+Output Formulas (The Template Engine): This sheet contains the master formulas that drive the final analysis. It utilizes advanced Excel functions such as LET and INDIRECT to create dynamic references. Instead of hard-linking to specific cells, the formulas dynamically search for data ranges based on the current "Year" and "Region" context. This design allows the automation engine to replicate these formulas across hundreds of generated tables without breaking references, a common failure point in static spreadsheets.
+
+Model Output (The Dashboard): This is the destination sheet where the dimensioning results are aggregated. For every Region and Year, the model generates a table that compares the Total Demand (aggregated from all Verticals) against the Total Supply (sum of all Site capabilities). It calculates two critical metrics:
+
+Saturation %: The ratio of Demand to Supply for both Active Users and Throughput. Values exceeding 100% highlight immediate functionality gaps.
+
+Cost Analysis: Based on the "Sites to Cover" (the delta required to reduce saturation below 100%) and the "Cost per Site," the model estimates the financial investment required to close the gap.
 
 3.3 Functional Components and Input Structure
 
